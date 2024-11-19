@@ -1,94 +1,112 @@
 
 import { LockOutlined } from "@ant-design/icons";
-import { Button, Card, Checkbox, Flex, Form, Input, Layout, Space } from "antd";
+import { Alert, Button, Card, Checkbox, Flex, Form, Input, Layout, Space } from "antd";
 import { Logo } from "../../assets/icons";
+import { useMutation } from "@tanstack/react-query";
+import { Credentials } from "../../types";
+import { login } from "../../http/api";
+
+const loginUser = async (userData: Credentials) => {
+    const { data } = await login(userData)
+
+    return data
+}
 const Login = () => {
+
+    const { mutate, isPending, isError, error } = useMutation({
+        mutationKey: ['login'],
+        mutationFn: loginUser,
+        onSuccess: () => {
+            console.log('Login successfull')
+        }
+    })
     return (
-        <div>
-            {/* <h1>Sign in</h1>
 
-            <input type="text" placeholder="Username" />
-            <input type="text" placeholder="Password" />
-            <label htmlFor="remember-me">Remember me</label>
-            <input id="remember-me" type="checkbox" />
-            <button>Log in</button>
-            <a href="#">Forgot password</a> */}
-
-            <Layout style={{
-                height: '100vh',
-                display: 'grid',
-                placeItems: 'center'
-            }}>
-                <Space direction="vertical" align="center" size={'large'}>
-                    <Layout.Content style={{
+        <Layout style={{
+            height: '100vh',
+            display: 'grid',
+            placeItems: 'center'
+        }}>
+            <Space direction="vertical" align="center" size={'large'}>
+                <Layout.Content style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                    <div style={{
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        gap: '10px'
                     }}>
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px'
-                        }}>
-                            <Logo />
-                            <h2 style={{ marginTop: '4px' }}>Quick Bite</h2>
-                        </div>
-                    </Layout.Content>
+                        <Logo />
+                        <h2 style={{ marginTop: '4px' }}>Quick Bite</h2>
+                    </div>
+                </Layout.Content>
 
-                    <Card title={<Space style={{
-                        width: '100%',
-                        fontSize: '16px',
-                        justifyContent: 'center'
-                    }}>
-                        <LockOutlined />
-                        Sign in
-                    </Space>}
-                        style={{ width: '350px' }}
+                <Card title={<Space style={{
+                    width: '100%',
+                    fontSize: '16px',
+                    justifyContent: 'center'
+                }}>
+                    <LockOutlined />
+                    Sign in
+                </Space>}
+                    style={{ width: '350px' }}
+                >
+
+                    {
+                        isError && (
+                            <Alert type="error" message={error.message} style={{ marginBottom: '16px' }} />
+                        )
+                    }
+
+                    <Form initialValues={{
+                        remember: true
+                    }}
+                        onFinish={(values) => {
+                            mutate({ email: values.username, password: values.password })
+                        }}
                     >
+                        <Form.Item name="username" rules={[
+                            {
+                                required: true,
+                                message: 'Please input your username'
+                            },
+                            {
+                                type: 'email',
+                                message: 'Email is not valid'
+                            }
+                        ]}>
+                            <Input placeholder="Username" />
+                        </Form.Item>
+                        <Form.Item name="password" rules={[
+                            {
+                                required: true,
+                                message: 'Please input your password'
+                            },
+                        ]}>
+                            <Input.Password placeholder="Password" />
+                        </Form.Item>
+                        <Flex justify="space-between">
+                            <Form.Item name="remember" valuePropName="checked">
+                                <Checkbox>
+                                    Remember me
+                                </Checkbox>
 
-                        <Form initialValues={{
-                            remember: true
-                        }}>
-                            <Form.Item name="username" rules={[
-                                {
-                                    required: true,
-                                    message: 'Please input your username'
-                                },
-                                {
-                                    type: 'email',
-                                    message: 'Email is not valid'
-                                }
-                            ]}>
-                                <Input placeholder="Username" />
                             </Form.Item>
-                            <Form.Item name="password" rules={[
-                                {
-                                    required: true,
-                                    message: 'Please input your password'
-                                },
-                            ]}>
-                                <Input.Password placeholder="Password" />
-                            </Form.Item>
-                            <Flex justify="space-between">
-                                <Form.Item name="remember" valuePropName="checked">
-                                    <Checkbox>
-                                        Remember me
-                                    </Checkbox>
+                            <a className="forgot-password">Forgot password</a>
+                        </Flex>
 
-                                </Form.Item>
-                                <a className="forgot-password">Forgot password</a>
-                            </Flex>
+                        <Form.Item>
+                            <Button type="primary" htmlType="submit" loading={isPending}>Log in</Button>
+                        </Form.Item>
+                    </Form>
 
-                            <Form.Item>
-                                <Button type="primary" htmlType="submit">Log in</Button>
-                            </Form.Item>
-                        </Form>
+                </Card>
+            </Space>
+        </Layout>
 
-                    </Card>
-                </Space>
-            </Layout>
-        </div>
     )
 }
 
