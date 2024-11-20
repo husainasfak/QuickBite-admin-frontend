@@ -4,8 +4,9 @@ import { Alert, Button, Card, Checkbox, Flex, Form, Input, Layout, Space } from 
 import { Logo } from "../../assets/icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Credentials } from "../../types";
-import { login, self } from "../../http/api";
+import { login, logout, self } from "../../http/api";
 import { useAuthStore } from "../../store";
+import { usePermission } from "../../hooks/usePermission";
 
 const loginUser = async (userData: Credentials) => {
     const { data } = await login(userData)
@@ -17,8 +18,9 @@ const getSelf = async () => {
     return data;
 }
 const Login = () => {
-    const { setUser } = useAuthStore()
-    const { data: selfData, refetch } = useQuery({
+    const { isAllowed } = usePermission()
+    const { setUser, logout: logoutFromStore } = useAuthStore()
+    const { refetch } = useQuery({
         queryKey: ['self'],
         queryFn: getSelf,
         enabled: false
@@ -29,8 +31,14 @@ const Login = () => {
         mutationFn: loginUser,
         onSuccess: async () => {
             const selfDataPromise = await refetch();
+
+            if (!isAllowed(selfDataPromise.data)) {
+                await logout()
+                logoutFromStore()
+                return;
+            }
+
             setUser(selfDataPromise.data)
-            console.log('self', selfDataPromise.data)
         }
     })
     return (
