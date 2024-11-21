@@ -1,7 +1,7 @@
 
 import { LockOutlined } from "@ant-design/icons";
 import { Alert, Button, Card, Checkbox, Flex, Form, Input, Layout, Space } from "antd";
-import { Logo } from "../../assets/icons";
+
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Credentials } from "../../types";
 import { login, logout, self } from "../../http/api";
