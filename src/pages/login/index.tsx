@@ -13,6 +13,11 @@ const loginUser = async (userData: Credentials) => {
 
     return data
 }
+const logoutUser = async () => {
+    const { data } = await logout()
+
+    return data
+}
 const getSelf = async () => {
     const { data } = await self()
     return data;
@@ -26,6 +31,14 @@ const Login = () => {
         enabled: false
     })
 
+    const logout = useMutation({
+        mutationKey: ['logout'],
+        mutationFn: logoutUser,
+        onSuccess: async () => {
+            logoutFromStore()
+        }
+    })
+
     const { mutate, isPending, isError, error } = useMutation({
         mutationKey: ['login'],
         mutationFn: loginUser,
@@ -33,8 +46,7 @@ const Login = () => {
             const selfDataPromise = await refetch();
 
             if (!isAllowed(selfDataPromise.data)) {
-                await logout()
-                logoutFromStore()
+                logout.mutate();
                 return;
             }
 
