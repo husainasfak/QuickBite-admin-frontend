@@ -7,6 +7,7 @@ import { Credentials } from "../../types";
 import { login, logout, self } from "../../http/api";
 import { useAuthStore } from "../../store";
 import { usePermission } from "../../hooks/usePermission";
+import QuickBiteLogo from "../../components/Logo";
 
 const loginUser = async (userData: Credentials) => {
     const { data } = await login(userData)
@@ -66,15 +67,7 @@ const Login = () => {
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}>
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '10px'
-                    }}>
-                        <Logo />
-                        <h2 style={{ marginTop: '4px' }}>Quick Bite</h2>
-                    </div>
+                    <QuickBiteLogo />
                 </Layout.Content>
 
                 <Card title={<Space style={{
