@@ -47,6 +47,7 @@ const Login = () => {
             const selfDataPromise = await refetch();
 
             if (!isAllowed(selfDataPromise.data)) {
+                console.log('hello')
                 logout.mutate();
                 return;
             }
