@@ -1,40 +1,54 @@
 import { Navigate, NavLink, Outlet } from "react-router-dom"
 import { useAuthStore } from "../store"
 import { Avatar, Badge, Dropdown, Flex, Layout, Menu, MenuProps, Space, theme } from "antd"
-import { BellFilled, HomeOutlined, ProductOutlined, SettingOutlined, ShopOutlined, SmileOutlined, UserOutlined } from "@ant-design/icons"
+import { BellFilled, HomeOutlined, ProductOutlined, ShopOutlined, SmileOutlined, UserOutlined } from "@ant-design/icons"
 import { useState } from "react"
 import QuickBiteLogo from "../components/Logo"
-import { useMutation } from "@tanstack/react-query"
 import { logout } from "../http/api"
 
+const getMenuItems = (role: string) => {
+    const baseItems = [
+        {
+            key: '/',
+            icon: <HomeOutlined />,
+            label: <NavLink to="/">Home</NavLink>,
+        },
 
-const items = [
-    {
-        key: '/',
-        icon: <HomeOutlined />,
-        label: <NavLink to='/'>Home</NavLink>
-    },
-    {
-        key: '/users',
-        icon: <UserOutlined />,
-        label: <NavLink to='/users'>Users</NavLink>
-    },
-    {
-        key: '/restaurants',
-        icon: <ShopOutlined />,
-        label: <NavLink to='/restaurants'>Restaurants</NavLink>
-    },
-    {
-        key: '/products',
-        icon: <ProductOutlined />,
-        label: <NavLink to='/products'>Products</NavLink>
-    },
-    {
-        key: '/promos',
-        icon: <SmileOutlined />,
-        label: <NavLink to='/promos'>Promos</NavLink>
-    },
-]
+        {
+            key: '/products',
+            icon: <ProductOutlined />,
+            label: <NavLink to="/products">Products</NavLink>,
+        },
+        {
+            key: '/orders',
+            icon: <ProductOutlined />,
+            label: <NavLink to="/orders">Orders</NavLink>,
+        },
+        {
+            key: '/promos',
+            icon: <SmileOutlined />,
+            label: <NavLink to="/promos">Promos</NavLink>,
+        },
+    ];
+
+    if (role === 'admin') {
+        const menus = [...baseItems];
+        menus.splice(1, 0, {
+            key: '/users',
+            icon: <UserOutlined />,
+            label: <NavLink to="/users">Users</NavLink>,
+        });
+        menus.splice(2, 0, {
+            key: '/restaurants',
+            icon: <ShopOutlined />,
+            label: <NavLink to="/restaurants">Restaurants</NavLink>,
+        });
+
+        return menus;
+    }
+
+    return baseItems;
+};
 
 
 
@@ -86,7 +100,7 @@ const Dashboard = () => {
 
             <QuickBiteLogo />
 
-            <Menu theme="light" defaultSelectedKeys={['/']} mode="inline" items={items} style={{ marginTop: '16px' }} />
+            <Menu theme="light" defaultSelectedKeys={['/']} mode="inline" items={getMenuItems(user.role)} style={{ marginTop: '16px' }} />
         </Layout.Sider>
         <Layout>
             <Layout.Header style={{ padding: '0 20px', background: colorBgContainer }}>
