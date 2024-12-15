@@ -6,10 +6,11 @@ import { CreateUserType, FieldData, User } from "../../types"
 import { useAuthStore } from "../../store"
 import UsersFilter from "./UsersFilter"
 import { Plus } from "lucide-react"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import UserForm from "./forms/UserForm"
 import { PER_PAGE } from "../../constants"
 import { LoadingOutlined } from "@ant-design/icons"
+import { debounce } from "lodash"
 
 
 const columns = [
@@ -74,12 +75,21 @@ const Users = () => {
         placeholderData: keepPreviousData
     })
 
-
+    const deboundedQUpdate = useMemo(() => {
+        return debounce((value: string | undefined) => {
+            setQueryParams((prev) => ({ ...prev, q: value }))
+        }, 1000)
+    }, [])
 
     const onFilterChange = (changedValue: FieldData[]) => {
         const changedFilterFields = changedValue.map((item) => ({ [item.name[0]]: item.value })).reduce((acc, item) => ({ ...acc, ...item }), {})
 
-        setQueryParams((prev) => ({ ...prev, ...changedFilterFields }))
+        if ('q' in changedFilterFields) {
+            deboundedQUpdate(changedFilterFields.q)
+        } else {
+            setQueryParams((prev) => ({ ...prev, ...changedFilterFields }))
+        }
+
     }
 
 
