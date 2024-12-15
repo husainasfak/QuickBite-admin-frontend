@@ -9,14 +9,15 @@ export type User = {
   firstName: string;
   lastName: string;
   createdAt: Date;
+  tenant: Tenant | null;
 };
 
 export type CreateUserType = {
   email: string;
   firstName: string;
   lastName: string;
-  tenantId:number;
-  role:string;
+  tenantId: number;
+  role: string;
 };
 
 export type FieldData = {

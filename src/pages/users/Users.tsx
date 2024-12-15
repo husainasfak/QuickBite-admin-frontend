@@ -45,6 +45,18 @@ const columns = [
             )
         }
     },
+    {
+        title: 'Restaurant',
+        dataIndex: 'tenant',
+        key: 'tenant',
+        render: (_text: string, record: User) => {
+            return (
+                <div>
+                    {record?.tenant?.name}
+                </div>
+            )
+        }
+    },
 ];
 const Users = () => {
     const queryClient = useQueryClient()
@@ -77,8 +89,8 @@ const Users = () => {
 
     const deboundedQUpdate = useMemo(() => {
         return debounce((value: string | undefined) => {
-            setQueryParams((prev) => ({ ...prev, q: value }))
-        }, 1000)
+            setQueryParams((prev) => ({ ...prev, q: value, currentPage: 1 }))
+        }, 500)
     }, [])
 
     const onFilterChange = (changedValue: FieldData[]) => {
@@ -87,7 +99,7 @@ const Users = () => {
         if ('q' in changedFilterFields) {
             deboundedQUpdate(changedFilterFields.q)
         } else {
-            setQueryParams((prev) => ({ ...prev, ...changedFilterFields }))
+            setQueryParams((prev) => ({ ...prev, ...changedFilterFields, currentPage: 1 }))
         }
 
     }
