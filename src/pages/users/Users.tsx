@@ -1,12 +1,12 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Breadcrumb, Button, Drawer, Flex, Form, Space, Spin, Table, theme } from "antd"
 import { Link, Navigate } from "react-router-dom"
-import { createUser, getUsers } from "../../http/api"
+import { createUser, getUsers, updateUser } from "../../http/api"
 import { CreateUserType, FieldData, User } from "../../types"
 import { useAuthStore } from "../../store"
 import UsersFilter from "./UsersFilter"
 import { Plus } from "lucide-react"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import UserForm from "./forms/UserForm"
 import { PER_PAGE } from "../../constants"
 import { LoadingOutlined } from "@ant-design/icons"
@@ -59,6 +59,8 @@ const columns = [
     },
 ];
 const Users = () => {
+    const [currentEditUser, setCurrentEditUser] = useState<User | null>(null)
+
     const queryClient = useQueryClient()
     const [drawerOpen, setDrawerOpen] = useState(false)
     const { user } = useAuthStore();
@@ -121,23 +123,42 @@ const Users = () => {
             return;
         },
     });
+    const { mutate: updateUserMutation } = useMutation({
+        mutationKey: ['updateUser'],
+        mutationFn: async (data: CreateUserType) => updateUser(data, currentEditUser!.id).then((res) => res.data),
+        onSuccess: async () => {
+            queryClient.invalidateQueries({ queryKey: ['getUsers'] });
+            return;
+        },
+    });
 
     const onHandleSubmit = async () => {
+
+        const isEditMode = !!currentEditUser;
         await form.validateFields();
-        await userMutate(form.getFieldsValue());
-        // const isEditMode = !!currentEditingUser;
-        // if (isEditMode) {
-        //     await updateUserMutation(form.getFieldsValue());
-        // } else {
-        //     
-        // }
+        if (isEditMode) {
+            await updateUserMutation(form.getFieldsValue());
+        } else {
+            await userMutate(form.getFieldsValue());
+        }
+
+
         form.resetFields();
-        // setCurrentEditingUser(null);
+        setCurrentEditUser(null)
         setDrawerOpen(false);
     };
 
 
     const [filterForm] = Form.useForm()
+
+
+    // Edit mode
+    useEffect(() => {
+        if (currentEditUser) {
+            setDrawerOpen(true)
+            form.setFieldsValue({ ...currentEditUser, tenantId: currentEditUser.tenant?.id })
+        }
+    }, [currentEditUser, form])
 
     return (
         <>
@@ -167,7 +188,19 @@ const Users = () => {
 
                 {
                     users && <Table
-                        columns={columns}
+                        columns={[...columns, {
+                            title: 'Actions',
+                            render: (_: string, record: User) => {
+                                console.log(record)
+                                return (
+                                    <Space>
+                                        <Button type="link" onClick={() => {
+                                            setCurrentEditUser(record)
+                                        }}>Edit</Button>
+                                    </Space>
+                                )
+                            }
+                        }]}
                         dataSource={users?.data}
                         rowKey={'id'}
                         pagination={{
@@ -192,13 +225,14 @@ const Users = () => {
 
 
             <Drawer
-                title={'Add User'}
+                title={currentEditUser ? 'Update User' : 'Add User'}
                 width={720}
                 destroyOnClose={true}
                 open={drawerOpen}
                 onClose={() => {
                     form.resetFields();
                     setDrawerOpen(false);
+                    setCurrentEditUser(null)
                 }}
                 styles={{ body: { backgroundColor: colorBgLayout } }}
                 extra={
@@ -216,7 +250,7 @@ const Users = () => {
                     </Space>
                 }>
                 <Form layout="vertical" form={form}>
-                    <UserForm />
+                    <UserForm isEditMode={!!currentEditUser} />
                 </Form>
             </Drawer>
         </>

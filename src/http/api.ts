@@ -13,6 +13,8 @@ export const getUsers = (queryParams: string) =>
   api.get(`/user?${queryParams}`);
 export const createUser = (userData: CreateUserType) =>
   api.post(`/user`, userData);
+export const updateUser = (userData: CreateUserType, id: string) =>
+  api.patch(`/user/${id}`, userData);
 
 export const getTenants = () => api.get(`/tenant`);
 export const createTenant = (tenant: CreateTenantData) =>
