@@ -1,4 +1,4 @@
-import { Navigate, NavLink, Outlet } from "react-router-dom"
+import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom"
 import { useAuthStore } from "../store"
 import { Avatar, Badge, Dropdown, Flex, Layout, Menu, MenuProps, Space, theme } from "antd"
 import { BellFilled, HomeOutlined, ProductOutlined, ShopOutlined, SmileOutlined, UserOutlined } from "@ant-design/icons"
@@ -56,12 +56,12 @@ const getMenuItems = (role: string) => {
 const Dashboard = () => {
     const [collapsed, setCollapsed] = useState(false);
     const { user, logout: logoutFromStore } = useAuthStore()
-
+    const location = useLocation()
     const {
         token: { colorBgContainer },
     } = theme.useToken();
     if (user === null) {
-        return <Navigate to="/auth/login" replace={true} />
+        return <Navigate to={`/auth/login?returnTo=${location.pathname}`} replace={true} />
     }
 
     const logoutUser = async () => {
@@ -100,7 +100,7 @@ const Dashboard = () => {
 
             <QuickBiteLogo />
 
-            <Menu theme="light" defaultSelectedKeys={['/']} mode="inline" items={getMenuItems(user.role)} style={{ marginTop: '16px' }} />
+            <Menu theme="light" defaultSelectedKeys={[location.pathname]} mode="inline" items={getMenuItems(user.role)} style={{ marginTop: '16px' }} />
         </Layout.Sider>
         <Layout>
             <Layout.Header style={{ padding: '0 20px', background: colorBgContainer }}>
