@@ -6,6 +6,7 @@ import Auth from "./layout/Auth";
 import Root from "./layout/Root";
 import Users from "./pages/users/Users";
 import Tenants from "./pages/tenants/Tenants";
+import Products from "./pages/products/Products";
 
 export const router = createBrowserRouter([
     {
@@ -30,7 +31,7 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: 'products',
-                        element: <Home />
+                        element: <Products />
                     },
                     {
                         path: 'promos',

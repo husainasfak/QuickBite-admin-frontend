@@ -11,7 +11,7 @@ const UserForm = ({ isEditMode = false }: { isEditMode: boolean }) => {
         queryFn: () => {
             // TODO: make this dynamic, like search for tenants in the input
             // `perPage=100&currentPage=1`
-            return getTenants().then((res) => res.data);
+            return getTenants(`perPage=100&currentPage=1`).then((res) => res.data);
         },
     });
 

@@ -70,7 +70,7 @@ const Tenants = () => {
             //     filteredParams as unknown as Record<string, string>
             // ).toString();
 
-            return getTenants().then((res) => res.data);
+            return getTenants(`perPage=100&currentPage=1`).then((res) => res.data);
         },
         placeholderData: keepPreviousData,
     });
